@@ -18,6 +18,13 @@ https://www.markdownguide.org/basic-syntax/
     https://www.youtube.com/watch?v=4nzI4RKwb5I&list=PLzMcBGfZo4-n4vJJybUVV3Un_NFS5EOgX&index=3
 
 
+3. GIT
+
+    Von der folgenden Seite habe ich nur bis Punkt 5 gemacht und den REST über VS Code.
+    Vielleicht muss Punkt 5 auch nicht gemacht werden.
+    https://sites.google.com/site/cartwrightraspberrypiprojects/home/ramblings/tutorials/using-github?pli=1
+
+
 4. DIVERS
 
     Die Session kann komplett geleert werden mit:
