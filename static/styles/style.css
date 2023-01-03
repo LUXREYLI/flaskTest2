@@ -1,0 +1,44 @@
+body {
+    background-color: #2e2e2e;
+}
+
+h3,
+h1 {
+    color: rgb(255, 255, 255);
+}
+
+.card {
+    background-color: black;
+    border-color: white;
+    width: 370px;
+    left: 50%;
+    margin-left: -185px;
+}
+
+.btn-primary,
+.btn-danger {
+    background-color: rgb(20, 43, 255);
+    border-color: white;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 7px;
+    font-size: 40px;
+    font-family: monospace;
+    min-height: 80px;
+    min-width: 80px;
+}
+
+.btn-danger {
+    background-color: rgb(204, 0, 0);
+}
+
+.form-control {
+    font-size: 50px;
+    font-family: monospace;
+    text-align: center;
+    height: 70px;
+    width: 360px;
+    margin-left: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
