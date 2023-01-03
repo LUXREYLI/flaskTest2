@@ -24,6 +24,8 @@ https://www.markdownguide.org/basic-syntax/
     Vielleicht muss Punkt 5 auch nicht gemacht werden.
     https://sites.google.com/site/cartwrightraspberrypiprojects/home/ramblings/tutorials/using-github?pli=1
 
+    Installation der GitLens Extension in VS Code und diese mit dem GitHub-Konto verbunden.
+    
 
 4. DIVERS
 
