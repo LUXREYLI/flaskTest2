@@ -11,12 +11,18 @@ ENV PYTHONUNBUFFERED=1
 # Workdir
 WORKDIR /projet
 
-# Install pip requirements
+# Install system dependencies
+RUN apt-get update
+RUN apt-get -y install
+# netcat gcc postgresql
+RUN apt-get clean
+
+# Install python requirements
 RUN pip install --upgrade pip
 COPY requirements.txt requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Install app
+# Install application
 COPY . .
 
 CMD [ "python3", "-m" , "python", "run", "--host=0.0.0.0"]

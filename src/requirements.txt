@@ -19,7 +19,9 @@
 #httpx==0.16.1
 #asgi-lifespan==1.0.1
 
-
-Flask==2.0.2
+Flask==2.2.2
 python-dotenv==0.21.0
 rpi.gpio==0.7.1
+
+# database
+flask-sqlalchemy==3.0.2
