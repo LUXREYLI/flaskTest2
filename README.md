@@ -20,14 +20,24 @@ https://www.markdownguide.org/basic-syntax/
 
 3. GIT
 
-    Von der folgenden Seite habe ich nur bis Punkt 5 gemacht und den REST über VS Code.
-    Vielleicht muss Punkt 5 auch nicht gemacht werden.
+    Von der folgenden Seite habe ich nur bis einschließlich Punkt 5 gemacht und den REST über VS Code.
+    Denke aber, dass Punkt 5 nicht gemacht werden muss.
+
     https://sites.google.com/site/cartwrightraspberrypiprojects/home/ramblings/tutorials/using-github?pli=1
 
-    Installation der GitLens Extension in VS Code und diese mit dem GitHub-Konto verbunden.
-    
 
-4. DIVERS
+    Installation der GitLens Extension in VS Code und diese mit dem GitHub-Konto verbunden.
+    Dazu ist der folgende Link auch interessant:
+
+    https://www.digitalocean.com/community/tutorials/how-to-use-git-integration-in-visual-studio-code-de
+
+
+5. Docker
+
+    https://www.freecodecamp.org/news/how-to-dockerize-a-flask-app/
+
+
+6. DIVERS
 
     Die Session kann komplett geleert werden mit:
     ```
