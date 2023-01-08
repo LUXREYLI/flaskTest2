@@ -25,4 +25,5 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Install application
 COPY . .
 
-CMD [ "python3", "-m" , "python", "run", "--host=0.0.0.0"]
+# Run the application in the container
+CMD [ "python3", "-m" , "python"]

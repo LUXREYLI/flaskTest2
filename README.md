@@ -92,3 +92,34 @@ https://www.markdownguide.org/basic-syntax/
     Arbeiten mit einer ENV-Datei
     Es kommt kein SECRET Code in den Source-Code und auch nicht nach GIT
     https://pypi.org/project/python-dotenv/
+
+
+8. ToDo
+
+    https://medium.com/free-code-camp/docker-development-workflow-a-guide-with-flask-and-postgres-db1a1843044a
+    ```
+    docker-compose up -d --build
+    docker-compose up
+    ```
+
+    Folgendes muss in die Docker Compose Datei eingebaut werden.
+    https://www.gerbenvanadrichem.com/infrastructure/accessing-gpio-pins-inside-a-docker-container-on-a-raspberry-pi/
+
+    https://stavshamir.github.io/python/dockerizing-a-flask-mysql-app-with-docker-compose/
+
+    https://pypi.org/project/flask-swagger/
+
+    https://auth0.com/blog/developing-restful-apis-with-python-and-flask/
+
+    WSGI HTTP Server - gunicorn
+    https://www.donskytech.com/create-flask-web-application-in-raspberry-pi/
+
+    What is???
+    https://flask-mqtt.readthedocs.io/en/latest/
+
+
+    https://testdriven.io/blog/dockerizing-flask-with-postgres-gunicorn-and-nginx/
+
+    
+
+

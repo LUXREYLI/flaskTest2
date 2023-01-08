@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, session
 from datetime import timedelta, datetime, timezone
 from dotenv import load_dotenv
+from flask_sqlalchemy import SQLAlchemy
 import os
 import threading
 import RPi.GPIO as GPIO
 
-# take environment variables from .env
+# take environment variables from .env   
 load_dotenv()
 
 app = Flask(__name__)
