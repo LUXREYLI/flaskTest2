@@ -70,7 +70,14 @@ https://www.markdownguide.org/basic-syntax/
     ```
 
 
-6. DIVERS
+6. THREAD
+
+    https://unbiased-coder.com/python-flask-multithreading/
+
+    https://www.section.io/engineering-education/how-to-perform-threading-timer-in-python/
+
+
+7. DIVERS
 
     Die Session kann komplett geleert werden mit:
     ```

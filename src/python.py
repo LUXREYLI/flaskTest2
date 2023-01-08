@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, session
 from datetime import timedelta, datetime, timezone
 from dotenv import load_dotenv
 import os
+import threading
 import RPi.GPIO as GPIO
 
 # take environment variables from .env
@@ -14,6 +15,12 @@ app.permanent_session_lifetime = timedelta(seconds=10)
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(18, GPIO.OUT)
+
+
+def CloseLock():
+    # switch off the led
+    GPIO.output(18, GPIO.LOW)
+    print('Ausgeschaltet...')
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -60,9 +67,31 @@ def keypad():
 
                 if actionValue == '#' and len(localBuf) == 7:
                     if localBuf == 'A#4567#':
-                        GPIO.output(18, GPIO.HIGH)
-                        # Ausgabe auf Console
-                        print("Eingeschlatet...")
+                        # Check if thread always running
+                        isThreadRunning = False
+                        for thread in threading.enumerate():
+                            if thread.name == 'Thread_CloseLock':
+                                isThreadRunning = True
+
+                        if not isThreadRunning:
+                            GPIO.output(18, GPIO.HIGH)
+
+                            # Ausgabe auf Console
+                            print("Eingeschaltet...")
+
+                            # Start a thread to close again after 10 sec.
+                            thread = threading.Timer(10, CloseLock)
+                            thread.name = 'Thread_CloseLock'
+                            thread.start()
+
+                            # clear the session
+                            session.clear()
+                        else:
+                            # clear the session
+                            session.clear()
+
+                            # Ausgabe auf Console
+                            print("Immer noch offen...")
                 elif len(localBuf) > 7:
                     localBuf = 'Error'
                     # clear the session
