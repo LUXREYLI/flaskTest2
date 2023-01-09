@@ -120,6 +120,9 @@ https://www.markdownguide.org/basic-syntax/
 
     https://testdriven.io/blog/dockerizing-flask-with-postgres-gunicorn-and-nginx/
 
+    https://flask-socketio.readthedocs.io/en/latest/
+
+    
     
 
 

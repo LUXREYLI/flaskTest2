@@ -6,7 +6,7 @@ import os
 import threading
 import RPi.GPIO as GPIO
 
-# take environment variables from .env   
+# take environment variables from .env
 load_dotenv()
 
 app = Flask(__name__)
