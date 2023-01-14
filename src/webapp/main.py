@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, jsonify
 from datetime import timedelta, datetime, timezone
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 import os
 import threading
+import re
 import RPi.GPIO as GPIO
 
 # take environment variables from .env
@@ -11,7 +12,8 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
-app.permanent_session_lifetime = timedelta(seconds=10)
+app.permanent_session_lifetime = timedelta(
+    seconds=10)  # evtl später aus .env nehmen
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -45,7 +47,6 @@ def keypad():
     if request.method == 'POST':
         actionValue = request.form.get('action')
         if actionValue in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'B', 'C', 'D', '#']:
-
             if not 'startTime' in session:
                 if actionValue in ['A', 'B', 'C', 'D']:
                     # save start moment (Aware Datetime -> https://docs.python.org/3/library/datetime.html)
@@ -55,7 +56,6 @@ def keypad():
             else:
                 diffInSeconds = (datetime.now(timezone.utc) -
                                  session['startTime']).total_seconds()
-
                 print(diffInSeconds)
                 if diffInSeconds > 15:
                     localBuf = 'Timeout'
@@ -97,6 +97,9 @@ def keypad():
                     localBuf = 'Error'
                     # clear the session
                     session.clear()
+
+                # replace all digits with "-"
+                localBuf = re.sub(r'\d', "-", localBuf)
             else:
                 # clear the session
                 session.clear()
@@ -108,6 +111,14 @@ def keypad():
         else:
             pass  # unknown
     return render_template('keypad.html', content=localBuf)
+
+
+@app.route("/test", methods=['POST'])
+def test():
+    inputJson = request.get_json(force=True)
+    print('data from client:', 34) # inputJson['keystroke'])
+    returnValue = {'answer': 42}
+    return jsonify(returnValue)
 
 
 if __name__ == "__main__":
