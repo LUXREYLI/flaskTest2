@@ -47,6 +47,7 @@ https://www.markdownguide.org/basic-syntax/
     docker ps
 
     # Build the docker image
+    docker build -t keypad .
     docker build -t flasktest2 .
 
     # Run the docker image
