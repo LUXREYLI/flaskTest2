@@ -114,9 +114,6 @@ https://www.markdownguide.org/basic-syntax/
     WSGI HTTP Server - gunicorn
     https://www.donskytech.com/create-flask-web-application-in-raspberry-pi/
 
-    What is???
-    https://flask-mqtt.readthedocs.io/en/latest/
-
 
     https://testdriven.io/blog/dockerizing-flask-with-postgres-gunicorn-and-nginx/
 
