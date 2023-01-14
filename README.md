@@ -123,6 +123,8 @@ https://www.markdownguide.org/basic-syntax/
     https://flask-socketio.readthedocs.io/en/latest/
 
     
-    
+9. GIO Notes
+
+    https://jinja.palletsprojects.com/en/3.1.x/templates/#jinja-filters.map
 
 
