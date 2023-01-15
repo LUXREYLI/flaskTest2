@@ -6,22 +6,25 @@ services:
       context: ./src/keypad
       dockerfile: Dockerfile
     devices:
-      - /dev/gpiomem:/dev/gpiomem      
+      - /dev/gpiomem:/dev/gpiomem
+    # use docker compose with the host network
+    # https://docs.docker.com/compose/compose-file/compose-file-v3/#network_mode
+    network_mode: "host"
     command: python3 main.py
     depends_on:
       - webapp
-      
+
   webapp:
     build:
       context: ./src/webapp
       dockerfile: Dockerfile
     devices:
-      - /dev/gpiomem:/dev/gpiomem      
+      - /dev/gpiomem:/dev/gpiomem
     #volumes:
     #  - ./src/wepapp/:/src/
     #command: uvicorn app.api.server:app --reload --workers 1 --host 0.0.0.0 --port 8000
-    #command: python3 -m main.py    
-    command: python3 main.py    
+    #command: python3 -m main.py
+    command: python3 main.py
     env_file:
       - ./src/webapp/.env
     ports:
