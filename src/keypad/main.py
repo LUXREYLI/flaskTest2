@@ -1,4 +1,3 @@
-import time
 import requests
 import json
 from keypad import keypad
@@ -9,12 +8,7 @@ if __name__ == '__main__':
 
     while True:
         # wait a keypress
-        digit = None
-        while digit == None:
-            digit = kp.getKey()
-        time.sleep(0.5)
-
-        print(digit)
+        digit = kp.getKey()
 
         # format the keystroke to json and pass it to the webapp
         jsonString = json.dumps({'keystroke': digit})

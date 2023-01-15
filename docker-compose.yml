@@ -1,7 +1,17 @@
 version: '3.8'
 
 services:
-  server:
+  keypad:
+    build:
+      context: ./src/keypad
+      dockerfile: Dockerfile
+    devices:
+      - /dev/gpiomem:/dev/gpiomem      
+    command: python3 main.py
+    depends_on:
+      - webapp
+      
+  webapp:
     build:
       context: ./src/webapp
       dockerfile: Dockerfile
