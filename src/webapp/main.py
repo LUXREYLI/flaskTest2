@@ -1,19 +1,17 @@
 from flask import Flask, render_template, request, session, jsonify
 from datetime import timedelta, datetime, timezone
-from dotenv import load_dotenv
+from decouple import config
 from flask_sqlalchemy import SQLAlchemy
 import os
 import threading
 import re
 import RPi.GPIO as GPIO
 
-# take environment variables from .env
-load_dotenv()
-
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY')
-app.permanent_session_lifetime = timedelta(
-    seconds=10)  # evtl später aus .env nehmen
+app.secret_key = config('SECRET_KEY')
+app.permanent_session_lifetime = timedelta(seconds=config('SESSION_LIFETIME', cast=int))
+
+#db = SQLAlchemy(app)
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -116,10 +114,10 @@ def keypad():
 @app.route("/test", methods=['POST'])
 def test():
     inputJson = request.get_json(force=True)
-    print('data from client:', 34) # inputJson['keystroke'])
+    print('data from client:', 34)  # inputJson['keystroke'])
     returnValue = {'answer': 42}
     return jsonify(returnValue)
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8000, debug=os.environ.get('DEBUG'))
+    app.run(host='0.0.0.0', port=8000, debug=config('DEBUG', cast=bool))
