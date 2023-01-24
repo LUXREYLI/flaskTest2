@@ -2,16 +2,40 @@ from flask import Flask, render_template, request, session, jsonify
 from datetime import timedelta, datetime, timezone
 from decouple import config
 from flask_sqlalchemy import SQLAlchemy
-import os
+from models import db, InfoModel
 import threading
 import re
 import RPi.GPIO as GPIO
 
 app = Flask(__name__)
 app.secret_key = config('SECRET_KEY')
-app.permanent_session_lifetime = timedelta(seconds=config('SESSION_LIFETIME', cast=int))
+app.permanent_session_lifetime = timedelta(
+    seconds=config('SESSION_LIFETIME', cast=int))
 
-#db = SQLAlchemy(app)
+# Database connection
+DB_URL = 'postgresql://{user}:{pw}@{url}:{port}/{db}'.format(
+    user=config('POSTGRES_USER'),
+    pw=config('POSTGRES_PASSWORD'),
+    url=config('POSTGRES_SERVER'),
+    port=config('POSTGRES_PORT'),
+    db=config('POSTGRES_DB'))
+
+app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy()
+db.init_app(app)
+
+
+class UserX(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String, unique=True, nullable=False)
+    email = db.Column(db.String)
+
+
+with app.app_context():
+    db.create_all()
+
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -117,6 +141,20 @@ def test():
     print('data from client:', 34)  # inputJson['keystroke'])
     returnValue = {'answer': 42}
     return jsonify(returnValue)
+
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    if request.method == 'GET':
+        return "Login via the login Form"
+
+    if request.method == 'POST':
+        name = request.form['name']
+        age = request.form['age']
+        new_user = InfoModel(name=name, age=age)
+        db.session.add(new_user)
+        db.session.commit()
+        return f"Done!!"
 
 
 if __name__ == "__main__":

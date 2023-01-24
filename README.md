@@ -52,19 +52,28 @@ https://www.markdownguide.org/basic-syntax/
    # Stop a currently running container
    docker stop <container-name>
 
-   # Another useful command to have when working with Docker is this one
+   # Delete unused Docker objects (containers, images, networks, volumes)
    docker container prune
 
    # To delete all containers including its volumes use
    docker rm -vf $(docker ps -aq)
 
+   # To delete all volumes
+   docker volume rm $(docker volume ls -q)
+
    # To delete all the images
    docker rmi -f $(docker images -aq)
+
+   # Command to clean all containers, images, volumes, networks, and undefined containers created with docker-compose
+   docker-compose down --rmi all -v --remove-orphans
 
    # Builds, (re)creates, starts containers
    docker-compose up --build
    # Stop all containers
    docker-compose down
+
+   # Connect to SQL container
+   docker-compose exec db psql -h localhost -U supermario --dbname=keypad
    ```
 
    Probleme \
@@ -118,3 +127,11 @@ https://www.markdownguide.org/basic-syntax/
     https://jinja.palletsprojects.com/en/3.1.x/templates/#jinja-filters.map
 
 
+
+
+
+https://www.askpython.com/python-modules/flask/flask-postgresql
+https://github.com/vsupalov/big-album-art/blob/79bdaba51717b62e0fe4dac59e85ec21e2e035df/baa/main.py#L40
+https://stackabuse.com/using-sqlalchemy-with-flask-and-postgresql/
+https://dev.to/blankgodd/working-with-postgresql-and-flasksqlalchemy-3c38
+https://pythonbasics.org/flask-sqlalchemy/
