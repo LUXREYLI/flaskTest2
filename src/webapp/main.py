@@ -2,17 +2,12 @@ from flask import Flask, render_template, request, session, jsonify
 from datetime import timedelta, datetime, timezone
 from decouple import config
 from flask_sqlalchemy import SQLAlchemy
-from models import db, InfoModel
+from models import db, Account
 import threading
 import re
 import RPi.GPIO as GPIO
 
-app = Flask(__name__)
-app.secret_key = config('SECRET_KEY')
-app.permanent_session_lifetime = timedelta(
-    seconds=config('SESSION_LIFETIME', cast=int))
-
-# Database connection
+# Database connection string
 DB_URL = 'postgresql://{user}:{pw}@{url}:{port}/{db}'.format(
     user=config('POSTGRES_USER'),
     pw=config('POSTGRES_PASSWORD'),
@@ -20,22 +15,16 @@ DB_URL = 'postgresql://{user}:{pw}@{url}:{port}/{db}'.format(
     port=config('POSTGRES_PORT'),
     db=config('POSTGRES_DB'))
 
+# create the flask app
+app = Flask(__name__)
+app.secret_key = config('SECRET_KEY')
+app.permanent_session_lifetime = timedelta(
+    seconds=config('SESSION_LIFETIME', cast=int))
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy()
+# init for accessing the database
 db.init_app(app)
-
-
-class UserX(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, unique=True, nullable=False)
-    email = db.Column(db.String)
-
-
-with app.app_context():
-    db.create_all()
-
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -53,6 +42,13 @@ def index():
     if request.method == 'POST':
         if request.form.get('action') == 'ON':
             GPIO.output(18, GPIO.HIGH)
+
+            # Read data of account B
+            # old method --> myData = Account.query.get('B')
+            # https://docs.sqlalchemy.org/en/14/changelog/migration_20.html#overview
+            myData = db.session.get(Account, 'B')
+            print(myData.email)
+
             # Ausgabe auf Console
             print("Eingeschlatet...")
         elif request.form.get('action') == 'OFF':
@@ -151,7 +147,7 @@ def login():
     if request.method == 'POST':
         name = request.form['name']
         age = request.form['age']
-        new_user = InfoModel(name=name, age=age)
+        # new_user = InfoModel(name=name, age=age)
         db.session.add(new_user)
         db.session.commit()
         return f"Done!!"
