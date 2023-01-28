@@ -14,12 +14,15 @@
 #httpx==0.16.1
 #asgi-lifespan==1.0.1
 
+# database
+#databases[postgresql]==0.4.2
+
 # webapp
 Flask==2.2.2
 python-decouple==3.7
+bcrypt==4.0.1
 rpi.gpio==0.7.1
 
 # database
-#databases[postgresql]==0.4.2
 flask-sqlalchemy==3.0.2
 psycopg2-binary==2.9.5

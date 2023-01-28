@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}index{% endblock %}
+{% block content %}
+<h3>Set Code</h3>
+  <form method="post" action="/setcode">
+    <div class="form-group">
+        <h3>Your Pin Code</h3>
+        <input type="password" class="form-control" name="Pincode1" placeholder="Pin code">
+        <h3>Confirm your Pin Code</h3>
+        <input type="password" class="form-control" name="Pincode2" placeholder="Pin code">
+        <br>
+        <button type="submit" class="btn btn-success">Confirm</button>
+      </div>
+  </form>
+{% endblock %}

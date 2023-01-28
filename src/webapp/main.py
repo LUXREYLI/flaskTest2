@@ -2,17 +2,13 @@ from flask import Flask, render_template, request, session, jsonify
 from datetime import timedelta, datetime, timezone
 from decouple import config
 from flask_sqlalchemy import SQLAlchemy
-from models import db, InfoModel
+from models import db, Account
 import threading
 import re
+import bcrypt
 import RPi.GPIO as GPIO
 
-app = Flask(__name__)
-app.secret_key = config('SECRET_KEY')
-app.permanent_session_lifetime = timedelta(
-    seconds=config('SESSION_LIFETIME', cast=int))
-
-# Database connection
+# Database connection string
 DB_URL = 'postgresql://{user}:{pw}@{url}:{port}/{db}'.format(
     user=config('POSTGRES_USER'),
     pw=config('POSTGRES_PASSWORD'),
@@ -20,22 +16,16 @@ DB_URL = 'postgresql://{user}:{pw}@{url}:{port}/{db}'.format(
     port=config('POSTGRES_PORT'),
     db=config('POSTGRES_DB'))
 
+# create the flask app
+app = Flask(__name__)
+app.secret_key = config('SECRET_KEY')
+app.permanent_session_lifetime = timedelta(
+    seconds=config('SESSION_LIFETIME', cast=int))
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy()
+# initialize the app with the extension
 db.init_app(app)
-
-
-class UserX(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, unique=True, nullable=False)
-    email = db.Column(db.String)
-
-
-with app.app_context():
-    db.create_all()
-
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -53,6 +43,30 @@ def index():
     if request.method == 'POST':
         if request.form.get('action') == 'ON':
             GPIO.output(18, GPIO.HIGH)
+
+            # Read data of account B
+            # old method --> myData = Account.query.get('B')
+            # https://docs.sqlalchemy.org/en/14/changelog/migration_20.html#overview
+            myData = db.session.get(Account, 'B')
+
+            if myData.password is None:
+                # set new password and convert string to byte
+                pwd = '1234'
+                bytePwd = pwd.encode('utf-8')
+
+                # generate a new salt
+                mySalt = bcrypt.gensalt()
+
+                # hash password qnd save the hash
+                myData.password = bcrypt.hashpw(bytePwd, mySalt)
+                db.session.commit()
+
+                print(myData.password)
+            else:
+                print('Pwd Check...')
+                print(bcrypt.checkpw(b'1234', myData.password))
+                print(bcrypt.checkpw(b'5678', myData.password))
+
             # Ausgabe auf Console
             print("Eingeschlatet...")
         elif request.form.get('action') == 'OFF':
@@ -143,18 +157,17 @@ def test():
     return jsonify(returnValue)
 
 
-@app.route('/login', methods=['POST', 'GET'])
-def login():
-    if request.method == 'GET':
-        return "Login via the login Form"
-
+@app.route("/setcode", methods=['GET', 'POST'])
+def setcode():
     if request.method == 'POST':
-        name = request.form['name']
-        age = request.form['age']
-        new_user = InfoModel(name=name, age=age)
-        db.session.add(new_user)
-        db.session.commit()
-        return f"Done!!"
+        print(request.form.get('Pincode1'))
+        print(request.form.get('Pincode2'))
+        if request.form.get('Pincode1') != '' and request.form.get('Pincode1') == request.form.get('Pincode2'):
+            GPIO.output(18, GPIO.HIGH)
+            # https://stackoverflow.com/questions/49429940/use-jinja-to-dynamically-generate-form-inputs-and-labels-from-python-list
+    else:
+        pass
+    return render_template('setcode.html')
 
 
 if __name__ == "__main__":
