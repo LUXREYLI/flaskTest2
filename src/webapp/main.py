@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from models import db, Account
 import threading
 import re
+import bcrypt
 import RPi.GPIO as GPIO
 
 # Database connection string
@@ -23,7 +24,7 @@ app.permanent_session_lifetime = timedelta(
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# init for accessing the database
+# initialize the app with the extension
 db.init_app(app)
 
 GPIO.setmode(GPIO.BCM)
@@ -47,7 +48,24 @@ def index():
             # old method --> myData = Account.query.get('B')
             # https://docs.sqlalchemy.org/en/14/changelog/migration_20.html#overview
             myData = db.session.get(Account, 'B')
-            print(myData.email)
+
+            if myData.password is None:
+                # set new password and convert string to byte
+                pwd = '1234'
+                bytePwd = pwd.encode('utf-8')
+
+                # generate a new salt
+                mySalt = bcrypt.gensalt()
+
+                # hash password qnd save the hash
+                myData.password = bcrypt.hashpw(bytePwd, mySalt)
+                db.session.commit()
+
+                print(myData.password)
+            else:
+                print('Pwd Check...')
+                print(bcrypt.checkpw(b'1234', myData.password))
+                print(bcrypt.checkpw(b'5678', myData.password))
 
             # Ausgabe auf Console
             print("Eingeschlatet...")
@@ -139,18 +157,17 @@ def test():
     return jsonify(returnValue)
 
 
-@app.route('/login', methods=['POST', 'GET'])
-def login():
-    if request.method == 'GET':
-        return "Login via the login Form"
-
+@app.route("/setcode", methods=['GET', 'POST'])
+def setcode():
     if request.method == 'POST':
-        name = request.form['name']
-        age = request.form['age']
-        # new_user = InfoModel(name=name, age=age)
-        db.session.add(new_user)
-        db.session.commit()
-        return f"Done!!"
+        print(request.form.get('Pincode1'))
+        print(request.form.get('Pincode2'))
+        if request.form.get('Pincode1') != '' and request.form.get('Pincode1') == request.form.get('Pincode2'):
+            GPIO.output(18, GPIO.HIGH)
+            # https://stackoverflow.com/questions/49429940/use-jinja-to-dynamically-generate-form-inputs-and-labels-from-python-list
+    else:
+        pass
+    return render_template('setcode.html')
 
 
 if __name__ == "__main__":
