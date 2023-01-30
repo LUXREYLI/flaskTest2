@@ -32,6 +32,12 @@ h1 {
     background-color: rgb(204, 0, 0);
 }
 
+.btn-success {
+    min-height: 50px;
+    min-width: 364px;
+    font-size: 40px;
+}
+
 .form-control {
     font-size: 50px;
     font-family: monospace;

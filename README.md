@@ -103,6 +103,9 @@ https://www.markdownguide.org/basic-syntax/
    The casting and the ability to specify defaults are really convenient and something I miss when using python-dotenv! \
    https://pybit.es/articles/how-to-handle-environment-variables-in-python/
 
+   bcrypt \
+   https://stackabuse.com/hashing-passwords-in-python-with-bcrypt/
+
 8. ToDo \
     https://medium.com/free-code-camp/docker-development-workflow-a-guide-with-flask-and-postgres-db1a1843044a
 

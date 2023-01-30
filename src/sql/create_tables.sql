@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS account (
   account_id CHAR(1) PRIMARY KEY,
   email VARCHAR(250) UNIQUE NOT NULL,
+  password BYTEA NULL,
   initialized BOOLEAN NOT NULL
 );
 

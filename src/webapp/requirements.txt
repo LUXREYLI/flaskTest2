@@ -20,6 +20,7 @@
 # webapp
 Flask==2.2.2
 python-decouple==3.7
+bcrypt==4.0.1
 rpi.gpio==0.7.1
 
 # database
