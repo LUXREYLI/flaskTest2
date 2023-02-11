@@ -11,6 +11,12 @@ class Account(db.Model):
     password = db.Column(db.LargeBinary, nullable=True)
     initialized = db.Column(db.Boolean)
 
+class Parameter(db.Model):
+    __tablename__ = 'parameter'
+    parameter_id = db.Column(db.SmallInteger, primary_key=True)
+    password = db.Column(db.LargeBinary, nullable=True)
+    initialized = db.Column(db.Boolean)
+
 # class InfoModel(db.Model):
 #    __tablename__ = 'info_table'
 

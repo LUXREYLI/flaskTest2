@@ -1,3 +1,10 @@
+-- Creation of parameter table
+CREATE TABLE IF NOT EXISTS parameter (
+  parameter_id SMALLINT PRIMARY KEY,
+  password BYTEA NULL,
+  initialized BOOLEAN NOT NULL
+);
+
 -- Creation of account table
 CREATE TABLE IF NOT EXISTS account (
   account_id CHAR(1) PRIMARY KEY,
@@ -16,6 +23,11 @@ CREATE TABLE IF NOT EXISTS loginfo (
       FOREIGN KEY(account_id)
     REFERENCES account(account_id)
 );
+
+-- Fill parameter table
+INSERT INTO parameter(parameter_id, initialized)
+VALUES (1, FALSE)
+ON CONFLICT (parameter_id) DO NOTHING;
 
 -- Fill account table
 INSERT INTO account(account_id, email, initialized)

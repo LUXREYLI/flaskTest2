@@ -1,15 +1,29 @@
 {% extends "base.html" %}
-{% block title %}index{% endblock %}
+{% block title %}Pin Management{% endblock %}
 {% block content %}
-<h3>Set Code</h3>
-  <form method="post" action="/setcode">
-    <div class="form-group">
-        <h3>Your Pin Code</h3>
-        <input type="password" class="form-control" name="Pincode1" placeholder="Pin code">
-        <h3>Confirm your Pin Code</h3>
-        <input type="password" class="form-control" name="Pincode2" placeholder="Pin code">
-        <br>
-        <button type="submit" class="btn btn-success">Confirm</button>
-      </div>
-  </form>
+
+{% if controls is not none %}
+
+<form method="post" action="/setcode?mode={{ mode }}">
+  <div class="form-group">
+    <!-- show all controls of the dictionary  -->
+    {% for item in controls %}
+    <h3>{{ controls[item].label }}</h3>
+    <input type="password" class="form-control" name="{{ controls[item].controlName }}" placeholder="Pin code">
+    {% endfor %}
+    <br>
+    <button type="submit" class="btn btn-success">Confirm</button>
+  </div>
+  {% if message is not none %}
+  <div class="alert alert-danger d-flex align-items-center" role="alert">
+    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+    <div>
+      {{ message }}
+    </div>
+  </div>
+  {% endif %}
+</form>
+{% else %}
+<h3>The mode must be specified --> .../setcode?mode=1 or .../setcode?mode=3</h3>
+{% endif %}
 {% endblock %}

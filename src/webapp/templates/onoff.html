@@ -1,9 +1,8 @@
 {% extends "base.html" %}
-{% block title %}index{% endblock %}
+{% block title %}On Off{% endblock %}
 {% block content %}
-<h3>Our Flask Buttons</h3>
 
-<form method="post" action="/">
+<form method="post" action="/onoff">
     <button type="submit" value="ON" class="btn btn-success" name="action">Einschalten</button>
     <button type="submit" value="OFF" class="btn btn-danger" name="action">Ausschalten</button>
 </form>

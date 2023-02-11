@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, session, jsonify
+from flask import Flask, render_template, request, session, jsonify, redirect, url_for
 from datetime import timedelta, datetime, timezone
 from decouple import config
 from flask_sqlalchemy import SQLAlchemy
-from models import db, Account
+from models import db, Account, Parameter
 import threading
 import re
 import bcrypt
@@ -38,46 +38,8 @@ def CloseLock():
     print('Ausgeschaltet...')
 
 
-@app.route("/", methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        if request.form.get('action') == 'ON':
-            GPIO.output(18, GPIO.HIGH)
-
-            # Read data of account B
-            # old method --> myData = Account.query.get('B')
-            # https://docs.sqlalchemy.org/en/14/changelog/migration_20.html#overview
-            myData = db.session.get(Account, 'B')
-
-            if myData.password is None:
-                # set new password and convert string to byte
-                pwd = '1234'
-                bytePwd = pwd.encode('utf-8')
-
-                # generate a new salt
-                mySalt = bcrypt.gensalt()
-
-                # hash password qnd save the hash
-                myData.password = bcrypt.hashpw(bytePwd, mySalt)
-                db.session.commit()
-
-                print(myData.password)
-            else:
-                print('Pwd Check...')
-                print(bcrypt.checkpw(b'1234', myData.password))
-                print(bcrypt.checkpw(b'5678', myData.password))
-
-            # Ausgabe auf Console
-            print("Eingeschlatet...")
-        elif request.form.get('action') == 'OFF':
-            GPIO.output(18, GPIO.LOW)
-        else:
-            pass  # unknown
-    return render_template('index.html')
-
-
 # Keypad
-@app.route("/keypad", methods=['GET', 'POST'])
+@app.route("/", methods=['GET', 'POST'])
 def keypad():
     localBuf = ''
     if request.method == 'POST':
@@ -149,6 +111,49 @@ def keypad():
     return render_template('keypad.html', content=localBuf)
 
 
+@app.route("/onoff", methods=['GET', 'POST'])
+def onoff():
+    myData = db.session.get(Parameter, 1)
+    if myData.password is None:
+        # masterpassword is not known
+        return redirect(url_for('setcode', mode=1))
+    else:
+        if request.method == 'POST':
+            if request.form.get('action') == 'ON':
+                GPIO.output(18, GPIO.HIGH)
+
+                # Read data of account B
+                # old method --> myData = Account.query.get('B')
+                # https://docs.sqlalchemy.org/en/14/changelog/migration_20.html#overview
+                myData = db.session.get(Account, 'B')
+
+                if myData.password is None:
+                    # set new password and convert string to byte
+                    pwd = '1234'
+                    bytePwd = pwd.encode('utf-8')
+
+                    # generate a new salt
+                    mySalt = bcrypt.gensalt()
+
+                    # hash password qnd save the hash
+                    myData.password = bcrypt.hashpw(bytePwd, mySalt)
+                    db.session.commit()
+
+                    print(myData.password)
+                else:
+                    print('Pwd Check...')
+                    print(bcrypt.checkpw(b'1234', myData.password))
+                    print(bcrypt.checkpw(b'5678', myData.password))
+
+                # Ausgabe auf Console
+                print("Eingeschlatet...")
+            elif request.form.get('action') == 'OFF':
+                GPIO.output(18, GPIO.LOW)
+            else:
+                pass  # unknown
+        return render_template('onoff.html')
+
+
 @app.route("/test", methods=['POST'])
 def test():
     inputJson = request.get_json(force=True)
@@ -159,15 +164,49 @@ def test():
 
 @app.route("/setcode", methods=['GET', 'POST'])
 def setcode():
+    # The mode must be specified
+    #   mode=1 --> 2 controls to set the masterpassword
+    #   mode=2 --> 3 controls
+    modeOfSetCode = request.args.get('mode')
+    message = None
+
     if request.method == 'POST':
-        print(request.form.get('Pincode1'))
-        print(request.form.get('Pincode2'))
-        if request.form.get('Pincode1') != '' and request.form.get('Pincode1') == request.form.get('Pincode2'):
-            GPIO.output(18, GPIO.HIGH)
-            # https://stackoverflow.com/questions/49429940/use-jinja-to-dynamically-generate-form-inputs-and-labels-from-python-list
+        print(modeOfSetCode)
+        if modeOfSetCode == '1':
+            newPwd = request.form.get('NewPassword')
+            if newPwd != '' and newPwd == request.form.get('ConfirmPassword'):
+                # convert string to byte
+                bytePwd = newPwd.encode('utf-8')
+
+                # generate a new salt
+                mySalt = bcrypt.gensalt()
+
+                # hash password and save the hash
+                myData = db.session.get(Parameter, 1)
+                myData.password = bcrypt.hashpw(bytePwd, mySalt)
+                myData.initialized = True
+                db.session.commit()
+
+                return redirect(url_for('onoff', mode=1))
+            else:
+                message = 'Your Password is wrong'
+
+    if modeOfSetCode == '1':
+        listOfControls = {1: {'controlName': 'NewPassword',
+                              'label': 'New password'},
+                          2: {'controlName': 'ConfirmPassword',
+                              'label': 'Confirm password'}}
+    elif modeOfSetCode == '3':
+        listOfControls = {1: {'controlName': 'CurrentPassword',
+                              'label': 'Current password'},
+                          2: {'controlName': 'NewPassword',
+                              'label': 'New password'},
+                          3: {'controlName': 'ConfirmPassword',
+                              'label': 'Confirm password'}}
     else:
-        pass
-    return render_template('setcode.html')
+        listOfControls = None
+
+    return render_template('setcode.html', mode=modeOfSetCode, controls=listOfControls, message=message)
 
 
 if __name__ == "__main__":
