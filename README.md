@@ -74,6 +74,12 @@ https://www.markdownguide.org/basic-syntax/
 
    # Connect to SQL container
    docker-compose exec db psql -h localhost -U supermario --dbname=keypad
+
+   # Reset Masterpassword
+   UPDATE parameter SET password = NULL, initialized = FALSE;
+
+   # See table content
+   SELECT * FROM parameter;
    ```
 
    Probleme \

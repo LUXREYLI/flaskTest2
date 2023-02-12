@@ -5,6 +5,7 @@ body {
 h3,
 h1 {
     color: rgb(255, 255, 255);
+    margin-left: 4px;
 }
 
 .card {
@@ -34,8 +35,11 @@ h1 {
 
 .btn-success {
     min-height: 50px;
-    min-width: 364px;
+    min-width: 360px;
     font-size: 40px;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-bottom: 4px;
 }
 
 .form-control {
@@ -46,5 +50,30 @@ h1 {
     width: 360px;
     margin-left: 4px;
     margin-top: 4px;
+    margin-right: 4px;
     margin-bottom: 4px;
 }
+
+.alert {
+    text-align: center;
+    height: 35px;
+    min-width: 360px;
+    font-size: 20px;
+    line-height: 1px;
+    background-color: transparent;
+    border-color: transparent;
+    color: rgb(255, 50, 50);
+    animation: alert 1s ease;
+}
+
+@keyframes alert {
+    0% {
+      transform: scale(0.1, 0.1);
+    }
+    50% {
+      transform: scale(1.1, 1.1);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
+  }

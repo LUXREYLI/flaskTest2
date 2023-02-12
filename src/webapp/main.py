@@ -114,7 +114,7 @@ def keypad():
 @app.route("/onoff", methods=['GET', 'POST'])
 def onoff():
     myData = db.session.get(Parameter, 1)
-    if myData.password is None:
+    if myData.initialized == False:
         # masterpassword is not known
         return redirect(url_for('setcode', mode=1))
     else:
@@ -189,7 +189,7 @@ def setcode():
 
                 return redirect(url_for('onoff', mode=1))
             else:
-                message = 'Your Password is wrong'
+                message = 'Wrong Password. Try again.'
 
     if modeOfSetCode == '1':
         listOfControls = {1: {'controlName': 'NewPassword',
