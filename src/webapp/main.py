@@ -209,5 +209,15 @@ def setcode():
     return render_template('setcode.html', mode=modeOfSetCode, controls=listOfControls, message=message)
 
 
+@app.route("/accounts", methods=['GET', 'POST'])
+def accounts():
+    # get all data from table 'account'
+    myData = db.session.query(Account).order_by(Account.account_id)
+
+
+    return render_template('accounts.html', accounts=myData)
+
+
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8000, debug=config('DEBUG', cast=bool))
