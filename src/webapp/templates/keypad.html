@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}index{% endblock %}
+{% block title %}Keypad{% endblock %}
 {% block content %}
-<h3>Keypad</h3>
 <div class="card">
   <input class="form-control" type="text" placeholder="{{content}}" readonly>
-  <form method="post" action="/keypad">
+  <form method="post" action="/">
+    <br>
     <button type="submit" value="1" class="btn btn-primary" name="action">1</button>
     <button type="submit" value="2" class="btn btn-primary" name="action">2</button>
     <button type="submit" value="3" class="btn btn-primary" name="action">3</button>

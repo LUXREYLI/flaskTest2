@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Pin Management{% endblock %}
+{% block content %}
+
+{% if controls is not none %}
+<div class="card">
+  <form method="post" action="/setcode?mode={{ mode }}">
+    <div class="form-group">
+      <!-- define the password pattern  -->
+      {% set pwdPattern = '[0-9]{5}' if (mode == '1' or mode == '2') else '[0-9]{4}' %}
+
+      <!-- show all controls of the dictionary  -->
+      {% for item in controls %}
+      <h3>{{ controls[item].label }}</h3>
+      <input type="password" pattern="{{ pwdPattern }}" class="form-control" name="{{ controls[item].controlName }}" placeholder="Pin code">
+      {% endfor %}
+      <br>
+      <button type="submit" class="btn btn-success">Confirm</button>
+    </div>
+    {% if message is not none %}
+    <div class="alert alert-danger" role="alert">
+      {{ message }}
+    </div>
+    {% endif %}
+  </form>
+  {% else %}
+  <h3>The mode must be specified --> .../setcode?mode=1 or .../setcode?mode=3</h3>
+</div>
+{% endif %}
+{% endblock %}
