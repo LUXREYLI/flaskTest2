@@ -112,10 +112,10 @@ https://www.markdownguide.org/basic-syntax/
    bcrypt \
    https://stackabuse.com/hashing-passwords-in-python-with-bcrypt/
 
+8. Postgres \
+   https://medium.com/free-code-camp/docker-development-workflow-a-guide-with-flask-and-postgres-db1a1843044a
+
 8. ToDo \
-    https://medium.com/free-code-camp/docker-development-workflow-a-guide-with-flask-and-postgres-db1a1843044a
-
-
     https://stavshamir.github.io/python/dockerizing-a-flask-mysql-app-with-docker-compose/
 
     https://pypi.org/project/flask-swagger/
