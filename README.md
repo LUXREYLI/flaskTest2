@@ -144,3 +144,8 @@ https://github.com/vsupalov/big-album-art/blob/79bdaba51717b62e0fe4dac59e85ec21e
 https://stackabuse.com/using-sqlalchemy-with-flask-and-postgresql/
 https://dev.to/blankgodd/working-with-postgresql-and-flasksqlalchemy-3c38
 https://pythonbasics.org/flask-sqlalchemy/
+
+ich habe den Folder __pycache__ versteckt -> https://paulnelson.ca/posts/hiding-pycache-files-in-vscode
+
+Session are cookie based... \
+https://medium.com/thedevproject/flask-sessions-what-are-they-for-how-it-works-what-options-i-have-to-persist-this-data-4ca48a34d3

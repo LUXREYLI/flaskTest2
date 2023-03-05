@@ -7,22 +7,28 @@ if __name__ == '__main__':
     # Initialize
     kp = keypad()
 
-    url = "http://localhost:8000/physicalkeypad"
+    webAppUrl = 'http://localhost:8000/physicalkeypad'
 
+    isCookieKnown = False
     while True:
         # wait a keypress
         digit = kp.getKey()
 
-        # format the keystroke to json string and pass it to the webapp
-        #jsonString = json.loads('{"keystroke": "' + digit + '"}')
-        #res = requests.post('http://localhost:8000/physicalkeypad', json=jsonString)
+        # prepare the header
+        if isCookieKnown == True:
+            headers = setCookieValue
+        else:
+            headers = CaseInsensitiveDict()
+        headers['Content-Type'] = 'application/json'
 
-
-
-
-        headers = CaseInsensitiveDict()
-        headers["Content-Type"] = "application/json"
+        # prepare the data to transfer
         data = '{"keystroke": "' + digit + '"}'
-        res = requests.post(url, headers=headers, data=data)
+
+        # make the POST request
+        res = requests.post(webAppUrl, headers=headers, data=data)
+
+        # cache the answer for 'Set-Cookie'
+        setCookieValue = {'Cookie': res.headers['Set-Cookie']}
+        isCookieKnown = True
 
         print('response from server:', res.text)

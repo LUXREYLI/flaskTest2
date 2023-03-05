@@ -58,7 +58,7 @@ def KeypadHandler(actionValue):
             if 'buffer' in session:
                 localBuf = session['buffer']
             localBuf = localBuf + actionValue
-            session["buffer"] = localBuf
+            session['buffer'] = localBuf
 
             if actionValue == '#' and len(localBuf) == 7:
                 if localBuf == 'A#4567#':
@@ -72,7 +72,7 @@ def KeypadHandler(actionValue):
                         GPIO.output(constant.LOCK_PIN, GPIO.HIGH)
 
                         # Ausgabe auf Console
-                        print("Eingeschaltet...")
+                        print('Eingeschaltet...')
 
                         # Start a thread to close again after 10 sec.
                         thread = threading.Timer(10, CloseLock)
@@ -86,14 +86,14 @@ def KeypadHandler(actionValue):
                         session.clear()
 
                         # Ausgabe auf Console
-                        print("Immer noch offen...")
+                        print('Immer noch offen...')
             elif len(localBuf) > 7:
                 localBuf = 'Error'
                 # clear the session
                 session.clear()
 
-            # replace all digits with "-"
-            localBuf = re.sub(r'\d', "-", localBuf)
+            # replace all digits with '-'
+            localBuf = re.sub(r'\d', '-', localBuf)
         else:
             # clear the session
             session.clear()
@@ -126,18 +126,7 @@ def physicalkeypad():
     actionValue = inputJson['keystroke']
     localBuf = KeypadHandler(actionValue)
 
-
-#    localBuf = ''
-#    inputJson = request.get_json()
-    #actionValue = inputJson['keystroke']
-    print(localBuf)
-#    session['elu'] = 'elu wert'
-
-#    print(session['elu'])
-
-    ############## ES SCHEINT EIN PROBLEM MIT DER SESSION zu SEIN #################################################
-    #localBuf = KeypadHandler(actionValue)
-    returnValue = {'answer': 'Q'}
+    returnValue = {'answer': localBuf}
     return jsonify(returnValue)
 
 
