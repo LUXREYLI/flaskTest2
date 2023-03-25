@@ -3,12 +3,36 @@
 {% block content %}
 
 <form method="post" action="/accounts">
-    {% for account in accounts %}
-        <div class='book'>
-            <h3>{{ account.account_id }}, {{ account.email }}, {{ account.password }}, {{ account.initialized }}</h3>
-        </div>
-    {% endfor %}
-    <button type="submit" value="ON" class="btn btn-success" name="action">Einschalten</button>
-    <button type="submit" value="OFF" class="btn btn-danger" name="action">Ausschalten</button>
+    <div class="card" style="width:auto; left: 2px; margin-left: 2px;"></div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">User</th>
+                <th scope="col">E-Mail</th>
+                <th scope="col">Password</th>
+                <th scope="col">initialized</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for account in accounts %}
+            <tr>
+                <th scope="row">{{ account.account_id }}</th>
+                <td><input class="form-control" type="text" name="mail_{{ account.account_id }}"
+                        value="{{ account.email }}"></td>
+                <td><input class="form-control" type="password" pattern='[0-9]{4}'
+                        name="password_{{ account.account_id }}" placeholder="----"></td>
+                <td><input class="form-control" type="text" name="initialized_{{ account.account_id }}"
+                        value="{{ account.initialized }}" readonly></td>
+                <td><button type="submit" value="Set_{{ account.account_id }}" class="btn btn-success"
+                        name="action">Set</button></td>
+                <td><button type="submit" value="Reset_{{ account.account_id }}" class="btn btn-danger"
+                        name="action">Reset</button></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
 </form>
 {% endblock %}

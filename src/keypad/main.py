@@ -4,7 +4,7 @@ import json
 from keypad import keypad
 
 if __name__ == '__main__':
-    # Initialize
+    # initialize
     kp = keypad()
 
     webAppUrl = 'http://localhost:8000/physicalkeypad'
