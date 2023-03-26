@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, session, jsonify, redirect, url_for
+from email_validator import validate_email, EmailNotValidError
 from datetime import timedelta, datetime, timezone
 from decouple import config
 from models import db, Account, Parameter
@@ -31,6 +32,7 @@ db.init_app(app)
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(constant.LOCK_PIN, GPIO.OUT)
+GPIO.setup(constant.ALERT_PIN, GPIO.OUT)
 
 
 # function to close the lock again after X seconds
@@ -40,30 +42,47 @@ def CloseLock():
 
 
 # function to handle the keypadtimezone
-def KeypadHandler(actionValue):
+def KeypadHandler(actionValue, softKeypad):
     localBuf = ''
     if actionValue in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'B', 'C', 'D', '#']:
+        actionValidated = False
+
         if not 'startTime' in session:
             if actionValue in ['A', 'B', 'C', 'D']:
-                # save start moment (Aware Datetime -> https://docs.python.org/3/library/datetime.html)
-                session['startTime'] = datetime.now(timezone.utc)
+                # check if the user is initialized
+                myData = db.session.get(Account, actionValue)
+                if not myData.initialized and myData.password is None:
+                    # the user is not configured
+                    localBuf = 'Not config.'
+                elif not myData.initialized:
+                    localBuf = 'Init - ' + actionValue
+                else:
+                    # save start moment (Aware Datetime -> https://docs.python.org/3/library/datetime.html)
+                    session['startTime'] = datetime.now(timezone.utc)
+                    actionValidated = True
             else:
                 localBuf = 'Error'
         else:
             diffInSeconds = (datetime.now(timezone.utc) -
                              session['startTime']).total_seconds()
-            print(diffInSeconds)
-            if diffInSeconds > 15:
+            if diffInSeconds > constant.LOCK_TIMEOUT:
                 localBuf = 'Timeout'
+            else:
+                actionValidated = True
 
-        if localBuf != 'Error' and localBuf != 'Timeout':
+        if actionValidated:
             if 'buffer' in session:
                 localBuf = session['buffer']
             localBuf = localBuf + actionValue
             session['buffer'] = localBuf
 
             if actionValue == '#' and len(localBuf) == 7:
-                if localBuf == 'A#4567#':
+                # read data of user account
+                myData = db.session.get(Account, localBuf[:1])
+
+                # check the current password with the saved password
+                currentPwd = localBuf[2:-1]
+                if bcrypt.checkpw(currentPwd.encode('utf-8'), myData.password):
                     # check if thread always running
                     isThreadRunning = False
                     for thread in threading.enumerate():
@@ -110,15 +129,25 @@ def KeypadHandler(actionValue):
     return localBuf
 
 
+# home route that redirects to softkeypad
+@app.route("/")
+def home():
+    return redirect("/softkeypad")
+
+
 # entry point for the soft keypad
-@app.route("/", methods=['GET', 'POST'])
-def keypad():
+@app.route("/softkeypad", methods=['GET', 'POST'])
+def softkeypad():
     localBuf = ''
     if request.method == 'POST':
         actionValue = request.form.get('action')
-        localBuf = KeypadHandler(actionValue)
+        localBuf = KeypadHandler(actionValue, True)
 
-    return render_template('keypad.html', content=localBuf)
+    if localBuf[0:7] == 'Init - ':
+        # initialize the user
+        return redirect(url_for('pincode', mode=3, user=localBuf[7:]))
+
+    return render_template('softkeypad.html', content=localBuf)
 
 
 # entry point for the physical keypad
@@ -126,7 +155,7 @@ def keypad():
 def physicalkeypad():
     inputJson = request.get_json()
     actionValue = inputJson['keystroke']
-    localBuf = KeypadHandler(actionValue)
+    localBuf = KeypadHandler(actionValue, False)
 
     returnValue = {'answer': localBuf}
     return jsonify(returnValue)
@@ -163,8 +192,17 @@ def accounts():
             myData.initialized = False
             db.session.commit()
         elif actionValue in ['Set_A', 'Set_B', 'Set_C', 'Set_D']:
-            # set account informations
+            # identify the user
             accountId = actionValue[4:]
+
+            # check the email
+            email = request.form.get('mail_' + accountId)
+            try:
+                email = validate_email(email).email
+            except EmailNotValidError as e:
+                print(str(e))
+
+            # set account informations
             myData = db.session.get(Account, accountId)
             myData.email = request.form.get('mail_' + accountId)
 
@@ -183,16 +221,19 @@ def accounts():
     myData = db.session.query(Account).order_by(Account.account_id)
     return render_template('accounts.html', accounts=myData)
 
+
 @app.route("/onoff", methods=['GET', 'POST'])
 def onoff():
     if request.method == 'POST':
         if request.form.get('action') == 'ON':
             GPIO.output(constant.LOCK_PIN, GPIO.HIGH)
+            GPIO.output(constant.ALERT_PIN, GPIO.HIGH)
 
             # output on console
             print("On...")
         elif request.form.get('action') == 'OFF':
             GPIO.output(constant.LOCK_PIN, GPIO.LOW)
+            GPIO.output(constant.ALERT_PIN, GPIO.LOW)
         else:
             pass  # unknown
     return render_template('onoff.html')
@@ -207,8 +248,11 @@ def pincode():
     modeOfPinCode = request.args.get('mode')
     message = None
 
-    if request.method == 'POST':
-        print(modeOfPinCode)
+    if request.method == 'GET':
+        if modeOfPinCode == '3' and not 'initializeUser' in session:
+            # save the user in the session
+            session['initializeUser'] = request.args.get('user')
+    elif request.method == 'POST':
         if modeOfPinCode == '1':
             newPwd = request.form.get('NewPassword')
             if newPwd != '' and newPwd == request.form.get('ConfirmPassword'):
@@ -239,6 +283,43 @@ def pincode():
                     return redirect(url_for('accounts'))
 
             message = 'Wrong Password. Try again.'
+        elif modeOfPinCode == '3':
+            initializeUser = session['initializeUser']
+
+            if not initializeUser is None:
+                currentPwd = request.form.get('CurrentPassword')
+                newPwd = request.form.get('NewPassword')
+                print(initializeUser)
+                print(currentPwd)
+                print(newPwd)
+                if currentPwd != '' and newPwd != '' and newPwd == request.form.get('ConfirmPassword'):
+                    # read data of user account
+                    myData = db.session.get(Account, initializeUser)
+
+                    # check the current password with the saved password
+                    currentPwd = request.form.get('CurrentPassword')
+                    if bcrypt.checkpw(currentPwd.encode('utf-8'), myData.password):
+                        # convert string to byte
+                        bytePwd = newPwd.encode('utf-8')
+
+                        # generate a new salt
+                        mySalt = bcrypt.gensalt()
+
+                        # hash password and save the hash
+                        myData.password = bcrypt.hashpw(bytePwd, mySalt)
+                        myData.initialized = True
+                        db.session.commit()
+
+                        # delete the user from the session
+                        session.pop('initializeUser', None)
+
+                        return redirect(url_for('softkeypad'))
+                    else:
+                        message = 'Wrong Password. Try again.'
+                else:
+                    message = 'Wrong Password. Try again.'
+            else:
+                return redirect(url_for('softkeypad'))
 
     if modeOfPinCode == '1':
         listOfControls = {1: {'controlName': 'NewPassword',

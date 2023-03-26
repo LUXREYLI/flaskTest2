@@ -1,15 +1,7 @@
-https://www.markdownguide.org/basic-syntax/
+1. Markdown \
+   https://www.markdownguide.org/basic-syntax/
 
-
-1. Bootstrap \
-   https://getbootstrap.com/docs/5.3/getting-started/introduction/ \
-   Bootstrap is a powerful, feature-packed frontend toolkit. \
-   I have not included Popper.
-
-2. HTML \
-   https://www.w3schools.com/tags/att_button_type.asp
-
-3. FLASK - youtube \
+2. FLASK - youtube \
    https://www.youtube.com/watch?v=4nzI4RKwb5I&list=PLzMcBGfZo4-n4vJJybUVV3Un_NFS5EOgX&index=3
 
 3. GIT \
@@ -22,16 +14,10 @@ https://www.markdownguide.org/basic-syntax/
    https://www.digitalocean.com/community/tutorials/how-to-use-git-integration-in-visual-studio-code-de
 
 5. Docker \
-   Allgemeine Erklärungen \
-   https://supperundsupper.com/schneller-besser-docker \
-   https://supperundsupper.com/docker-container-vs-virtuelle-maschine
-
-   Flask Anwendung unter Docker bereitstellen \
-   https://www.freecodecamp.org/news/how-to-dockerize-a-flask-app/ \
 
    ```console
    # Show the IP Address
-   hostnqme -I
+   hostname -I
 
    # List all docker images
    docker images
@@ -149,3 +135,12 @@ ich habe den Folder __pycache__ versteckt -> https://paulnelson.ca/posts/hiding-
 
 Session are cookie based... \
 https://medium.com/thedevproject/flask-sessions-what-are-they-for-how-it-works-what-options-i-have-to-persist-this-data-4ca48a34d3
+
+
+- den user nicht in der flask session speichern sondern an pincode übtragen und wiedergeben
+- die Variable softKeypad in der Auswertung einbauen - wenn nicht dann sie später löschen
+- email Validator noch etwas genauer testen (mit DNS Option)
+- email automatisch versenden
+- account seite kleiner machen (mobil machen)
+- schreiben wir noch in eine LOG Tabelle? Wenn nicht dann löschen von Tabelle loginfo
+- testen: session gültigkeit auf 2 minuten und in account jedesmal die Varibale neu in die sessions schreiben. Wird sie damit verlängert?
