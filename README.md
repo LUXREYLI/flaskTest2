@@ -137,10 +137,7 @@ Session are cookie based... \
 https://medium.com/thedevproject/flask-sessions-what-are-they-for-how-it-works-what-options-i-have-to-persist-this-data-4ca48a34d3
 
 
-- den user nicht in der flask session speichern sondern an pincode übtragen und wiedergeben
 - die Variable softKeypad in der Auswertung einbauen - wenn nicht dann sie später löschen
-- email Validator noch etwas genauer testen (mit DNS Option)
-- email automatisch versenden
 - account seite kleiner machen (mobil machen)
 - schreiben wir noch in eine LOG Tabelle? Wenn nicht dann löschen von Tabelle loginfo
-- testen: session gültigkeit auf 2 minuten und in account jedesmal die Varibale neu in die sessions schreiben. Wird sie damit verlängert?
+- neue MailAdresse erstellen oder eine andere von GIO gebrauchen

@@ -4,7 +4,10 @@
 
 {% if controls is not none %}
 <div class="card">
-  <form method="post" action="/pincode?mode={{ mode }}">
+  <!-- define the url parameters  -->
+  {% set parameter = '/pincode?mode=' ~ mode if (mode == '1' or mode == '2') else '/pincode?mode=3&user=' ~  user %}
+
+  <form method="post" action="{{ parameter }}">
     <div class="form-group">
       <!-- define the password pattern  -->
       {% set pwdPattern = '[0-9]{5}' if (mode == '1' or mode == '2') else '[0-9]{4}' %}

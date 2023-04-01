@@ -14,6 +14,7 @@
 
 # webapp
 Flask==2.2.2
+Flask-Mail==0.9.1
 python-decouple==3.7
 bcrypt==4.0.1
 rpi.gpio==0.7.1

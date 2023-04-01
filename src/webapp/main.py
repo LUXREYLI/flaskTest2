@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, session, jsonify, redirect, url_for
+from flask_mail import Mail, Message
 from email_validator import validate_email, EmailNotValidError
 from datetime import timedelta, datetime, timezone
 from decouple import config
+from random import randint
 from models import db, Account, Parameter
 import constant
 import threading
@@ -19,12 +21,24 @@ DB_URL = 'postgresql://{user}:{pw}@{url}:{port}/{db}'.format(
 
 # create the flask app
 app = Flask(__name__)
+
 app.secret_key = config('SECRET_KEY')
 app.permanent_session_lifetime = timedelta(
     seconds=config('SESSION_LIFETIME', cast=int))
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# config for email
+app.config['MAIL_SERVER'] = 'relay.proximus.be'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USERNAME'] = config('MAIL_USER')
+app.config['MAIL_PASSWORD'] = config('MAIL_PASSWORD')
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+
+# create an instance of the Mail class
+mail = Mail(app)
 
 # initialize the app with the extension
 db.init_app(app)
@@ -180,7 +194,11 @@ def accounts():
     if not 'adminMode' in session:
         # not in admin-mode
         return redirect(url_for('admin'))
+    else:
+        # extend session time
+        session['adminMode'] = True
 
+    accountId = None
     if request.method == 'POST':
         actionValue = request.form.get('action')
         if actionValue in ['Reset_A', 'Reset_B', 'Reset_C', 'Reset_D']:
@@ -195,19 +213,24 @@ def accounts():
             # identify the user
             accountId = actionValue[4:]
 
+            # get account informations
+            myData = db.session.get(Account, accountId)
+
             # check the email
             email = request.form.get('mail_' + accountId)
-            try:
-                email = validate_email(email).email
-            except EmailNotValidError as e:
-                print(str(e))
+            if not email is None and email != myData.email:
+                try:
+                    email = validate_email(
+                        email, check_deliverability=True).email
 
-            # set account informations
-            myData = db.session.get(Account, accountId)
-            myData.email = request.form.get('mail_' + accountId)
+                    # set account informations
+                    myData.email = email
 
-            # set new password and convert string to byte
-            pwd = request.form.get('password_' + accountId)
+                except EmailNotValidError as e:
+                    print(str(e))
+
+            # generate a random password and convert string to byte
+            pwd = str(randint(1000, 9999))
             bytePwd = pwd.encode('utf-8')
 
             # generate a new salt
@@ -217,8 +240,16 @@ def accounts():
             myData.password = bcrypt.hashpw(bytePwd, mySalt)
             db.session.commit()
 
-    # get all data from table 'account'
-    myData = db.session.query(Account).order_by(Account.account_id)
+            # send mail
+            msg = Message('PI From GIO', sender=config(
+                'MAIL_ADDRESS'), recipients=[email])
+            msg.body = 'Hello ' + email + ' your init password is: ' + pwd
+            mail.send(msg)
+            print('sending mail...')
+
+    # get all data for accountId
+    accountId = 'A' if accountId is None else accountId
+    myData = db.session.query(Account).filter(Account.account_id == accountId)
     return render_template('accounts.html', accounts=myData)
 
 
@@ -244,15 +275,12 @@ def pincode():
     # the mode must be specified
     #   mode=1 --> 2 controls to set the masterpassword
     #   mode=2 --> 1 control to enter in admin mode
-    #   mode=3 --> 3 controls to change password
+    #   mode=3 --> 3 controls to change password for user X
     modeOfPinCode = request.args.get('mode')
+    user = request.args.get('user')
     message = None
 
-    if request.method == 'GET':
-        if modeOfPinCode == '3' and not 'initializeUser' in session:
-            # save the user in the session
-            session['initializeUser'] = request.args.get('user')
-    elif request.method == 'POST':
+    if request.method == 'POST':
         if modeOfPinCode == '1':
             newPwd = request.form.get('NewPassword')
             if newPwd != '' and newPwd == request.form.get('ConfirmPassword'):
@@ -284,17 +312,12 @@ def pincode():
 
             message = 'Wrong Password. Try again.'
         elif modeOfPinCode == '3':
-            initializeUser = session['initializeUser']
-
-            if not initializeUser is None:
+            if not user is None:
                 currentPwd = request.form.get('CurrentPassword')
                 newPwd = request.form.get('NewPassword')
-                print(initializeUser)
-                print(currentPwd)
-                print(newPwd)
                 if currentPwd != '' and newPwd != '' and newPwd == request.form.get('ConfirmPassword'):
                     # read data of user account
-                    myData = db.session.get(Account, initializeUser)
+                    myData = db.session.get(Account, user)
 
                     # check the current password with the saved password
                     currentPwd = request.form.get('CurrentPassword')
@@ -309,9 +332,6 @@ def pincode():
                         myData.password = bcrypt.hashpw(bytePwd, mySalt)
                         myData.initialized = True
                         db.session.commit()
-
-                        # delete the user from the session
-                        session.pop('initializeUser', None)
 
                         return redirect(url_for('softkeypad'))
                     else:
@@ -339,7 +359,7 @@ def pincode():
     else:
         listOfControls = None
 
-    return render_template('pincode.html', mode=modeOfPinCode, controls=listOfControls, message=message)
+    return render_template('pincode.html', mode=modeOfPinCode, user=user, controls=listOfControls, message=message)
 
 
 if __name__ == "__main__":
