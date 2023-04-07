@@ -2,43 +2,40 @@
 {% block title %}Accounts{% endblock %}
 {% block content %}
 
-<form method="post" action="/accounts">
-    <div class="card" style="width:auto; left: 2px; margin-left: 2px;"></div>
-
-    <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
-        <option selected>Select the account</option>
-        <option value="A">A</option>
-        <option value="B">B</option>
-        <option value="C">C</option>
-        <option value="D">D</option>
-    </select>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">User</th>
-                <th scope="col">E-Mail</th>
-                <th scope="col">initialized</th>
-                <th scope="col"></th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
+<div class="card">
+    <form method="post" action="/accounts">
+        <div class="form-group">
             {% for account in accounts %}
-            <tr>
-                <th scope="row">{{ account.account_id }}</th>
-                <td><input class="form-control" type="text" name="mail_{{ account.account_id }}"
-                        value="{{ account.email }}"></td>
-                <td><input class="form-control" type="text" name="initialized_{{ account.account_id }}"
-                        value="{{ account.initialized }}" readonly></td>
-                <td><button type="submit" value="Set_{{ account.account_id }}" class="btn btn-success"
-                        name="action">Set</button></td>
-                <td><button type="submit" value="Reset_{{ account.account_id }}" class="btn btn-danger"
-                        name="action">Reset</button></td>
-            </tr>
+            <!-- listbox with all accounts  -->
+            <h3>Account ID</h3>
+            <select class="form-select" aria-label="Default select example" onchange="this.form.submit()"
+                name="account">
+                <option {{ 'selected' if account.account_id=='A' }} value="A">A</option>
+                <option {{ 'selected' if account.account_id=='B' }} value="B">B</option>
+                <option {{ 'selected' if account.account_id=='C' }} value="C">C</option>
+                <option {{ 'selected' if account.account_id=='D' }} value="D">D</option>
+            </select>
+
+            <h3>E-Mail</h3>
+            {% set mail = '' if account.email is none else account.email %}
+            <input class="form-control small" type="text" name="mail" value="{{ mail }}">
+            <h3>Initialized</h3>
+            <input class="form-control" type="text" name="initialized" value="{{ account.initialized }}" readonly>
+
+            <br>
+            <div class="d-grid gap-2 d-md-block">
+                <button type="submit" value="Set" class="btn btn-success small" name="action">Set</button>
+                {% if account.email is not none %}
+                <button type="submit" value="Reset" class="btn btn-danger" name="action">Reset</button>
+                {% endif %}
+            </div>
             {% endfor %}
-        </tbody>
-    </table>
-    </div>
-</form>
+        </div>
+        {% if message is not none %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+        {% endif %}
+    </form>
+</div>
 {% endblock %}

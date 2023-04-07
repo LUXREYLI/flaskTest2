@@ -4,7 +4,7 @@ from email_validator import validate_email, EmailNotValidError
 from datetime import timedelta, datetime, timezone
 from decouple import config
 from random import randint
-from models import db, Account, Parameter
+from models import db, Account, Parameter, LogInfo
 import constant
 import threading
 import re
@@ -55,6 +55,11 @@ def CloseLock():
     print('Off...')
 
 
+# function to check if email already exists in account
+def EmailExists(email):
+    return db.session.query(Account.query.filter(Account.email == email).exists()).scalar()
+
+
 # function to handle the keypadtimezone
 def KeypadHandler(actionValue, softKeypad):
     localBuf = ''
@@ -97,7 +102,7 @@ def KeypadHandler(actionValue, softKeypad):
                 # check the current password with the saved password
                 currentPwd = localBuf[2:-1]
                 if bcrypt.checkpw(currentPwd.encode('utf-8'), myData.password):
-                    # check if thread always running
+                    # check if thread is already running
                     isThreadRunning = False
                     for thread in threading.enumerate():
                         if thread.name == 'Thread_CloseLock':
@@ -109,8 +114,11 @@ def KeypadHandler(actionValue, softKeypad):
                         # output on console
                         print('On...')
 
-                        # start a thread to close again after 10 sec.
-                        thread = threading.Timer(10, CloseLock)
+                        # write to logInfo
+                        WriteLog(1, localBuf[:1])
+
+                        # start a thread to close again after 5 sec.
+                        thread = threading.Timer(5, CloseLock)
                         thread.name = 'Thread_CloseLock'
                         thread.start()
 
@@ -121,7 +129,13 @@ def KeypadHandler(actionValue, softKeypad):
                         session.clear()
 
                         # output on console
-                        print('Always on...')
+                        print('Already on...')
+
+                        # write to logInfo
+                        WriteLog(2, localBuf[:1])
+                else:
+                    # write to logInfo
+                    WriteLog(3, localBuf[:1])
             elif len(localBuf) > 7:
                 localBuf = 'Error'
                 # clear the session
@@ -141,6 +155,31 @@ def KeypadHandler(actionValue, softKeypad):
         pass  # unknown
 
     return localBuf
+
+
+# function to write to logInfoinfo
+def WriteLog(messageId, accountId=None):
+    if messageId == 1:
+        message = 'Successfully opened'
+    elif messageId == 2:
+        message = 'Already open'
+    elif messageId == 3:
+        message = 'Wrong password'
+    elif messageId == 4:
+        message = 'Reset account'
+    elif messageId == 5:
+        message = 'Set account information'
+    elif messageId == 6:
+        message = 'Initialize account'
+    else:
+        message = 'N/A'
+
+    newLogInfo = LogInfo(account_id=accountId,
+                         log_date=datetime.now(
+                             timezone.utc),
+                         log_description=message)
+    db.session.add(newLogInfo)
+    db.session.commit()
 
 
 # home route that redirects to softkeypad
@@ -198,59 +237,73 @@ def accounts():
         # extend session time
         session['adminMode'] = True
 
+    message = None
     accountId = None
     if request.method == 'POST':
+        # determine account
+        accountId = request.form.get('account')
+
         actionValue = request.form.get('action')
-        if actionValue in ['Reset_A', 'Reset_B', 'Reset_C', 'Reset_D']:
+        if actionValue == 'Reset':
             # reset account informations
-            accountId = actionValue[6:]
             myData = db.session.get(Account, accountId)
-            myData.email = accountId.lower() + '@unknown.com'
+            myData.email = None
             myData.password = None
             myData.initialized = False
             db.session.commit()
-        elif actionValue in ['Set_A', 'Set_B', 'Set_C', 'Set_D']:
-            # identify the user
-            accountId = actionValue[4:]
 
+            # write to logInfo
+            WriteLog(4, accountId)
+        elif actionValue == 'Set':
             # get account informations
             myData = db.session.get(Account, accountId)
 
             # check the email
-            email = request.form.get('mail_' + accountId)
-            if not email is None and email != myData.email:
-                try:
-                    email = validate_email(
-                        email, check_deliverability=True).email
+            email = request.form.get('mail')
+            if email is None or email.strip() == '':
+                message = 'E-Mail can\'t be empty...'
+            elif myData.email is None or email.strip() != myData.email:
+                if EmailExists(email):
+                    message = 'E-Mail already exists...'
+                else:
+                    try:
+                        email = validate_email(
+                            email, check_deliverability=True).email
 
-                    # set account informations
-                    myData.email = email
+                        # set account informations
+                        myData.email = email
 
-                except EmailNotValidError as e:
-                    print(str(e))
+                    except EmailNotValidError as e:
+                        print(str(e))
+                        message = 'E-Mail not valid...'
 
-            # generate a random password and convert string to byte
-            pwd = str(randint(1000, 9999))
-            bytePwd = pwd.encode('utf-8')
+            if message is None:
+                # generate a random password and convert string to byte
+                pwd = str(randint(1000, 9999))
+                bytePwd = pwd.encode('utf-8')
 
-            # generate a new salt
-            mySalt = bcrypt.gensalt()
+                # generate a new salt
+                mySalt = bcrypt.gensalt()
 
-            # hash password and save the hash
-            myData.password = bcrypt.hashpw(bytePwd, mySalt)
-            db.session.commit()
+                # hash password and save the hash
+                myData.password = bcrypt.hashpw(bytePwd, mySalt)
+                myData.initialized = False
+                db.session.commit()
 
-            # send mail
-            msg = Message('PI From GIO', sender=config(
-                'MAIL_ADDRESS'), recipients=[email])
-            msg.body = 'Hello ' + email + ' your init password is: ' + pwd
-            mail.send(msg)
-            print('sending mail...')
+                # send mail
+                msg = Message('PI From GIO', sender=config(
+                    'MAIL_ADDRESS'), recipients=[email])
+                msg.body = 'Hello ' + email + ' your init password is: ' + pwd
+                mail.send(msg)
+                message = 'E-Mail was sending...'
+
+                # write to logInfo
+                WriteLog(5, accountId)
 
     # get all data for accountId
     accountId = 'A' if accountId is None else accountId
     myData = db.session.query(Account).filter(Account.account_id == accountId)
-    return render_template('accounts.html', accounts=myData)
+    return render_template('accounts.html', accounts=myData, message=message)
 
 
 @app.route("/onoff", methods=['GET', 'POST'])
@@ -259,9 +312,6 @@ def onoff():
         if request.form.get('action') == 'ON':
             GPIO.output(constant.LOCK_PIN, GPIO.HIGH)
             GPIO.output(constant.ALERT_PIN, GPIO.HIGH)
-
-            # output on console
-            print("On...")
         elif request.form.get('action') == 'OFF':
             GPIO.output(constant.LOCK_PIN, GPIO.LOW)
             GPIO.output(constant.ALERT_PIN, GPIO.LOW)
@@ -332,6 +382,9 @@ def pincode():
                         myData.password = bcrypt.hashpw(bytePwd, mySalt)
                         myData.initialized = True
                         db.session.commit()
+
+                        # write to logInfo
+                        WriteLog(6, user)
 
                         return redirect(url_for('softkeypad'))
                     else:

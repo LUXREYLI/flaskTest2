@@ -138,6 +138,7 @@ https://medium.com/thedevproject/flask-sessions-what-are-they-for-how-it-works-w
 
 
 - die Variable softKeypad in der Auswertung einbauen - wenn nicht dann sie später löschen
-- account seite kleiner machen (mobil machen)
-- schreiben wir noch in eine LOG Tabelle? Wenn nicht dann löschen von Tabelle loginfo
 - neue MailAdresse erstellen oder eine andere von GIO gebrauchen
+
+- keypad - hier sollte es eine Lampe geben, wenn die Anlage nicht aktiv ist
+-        - eine andere Lampe, wenn der gewählte User nicht gesetzt ist
