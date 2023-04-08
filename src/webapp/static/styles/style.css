@@ -16,9 +16,10 @@ h1 {
     margin-left: -185px;
 }
 
+/* base config for button */
 .btn-primary,
+.btn-success,
 .btn-danger {
-    background-color: rgb(20, 43, 255);
     border-color: white;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -27,29 +28,22 @@ h1 {
     font-family: monospace;
     min-height: 80px;
     min-width: 80px;
+}
+
+/* change the color for background*/
+.btn-primary{
+    background-color: rgb(20, 43, 255);
 }
 
 .btn-danger {
     background-color: rgb(204, 0, 0);
 }
 
-.btn-success {
-    border-color: white;
-    min-height: 80px;
+.btn-danger.variant2,
+.btn-success.variant2{
     min-width: 360px;
-    font-size: 40px;
-    font-family: monospace;
     margin-left: 4px;
     margin-right: 4px;
-    margin-bottom: 4px;
-}
-
-.btn-success.small {
-    margin-top: 5px;
-    margin-bottom: 5px;
-    margin-left: 7px;
-    min-height: 80px;
-    min-width: 80px;
 }
 
 .form-control {

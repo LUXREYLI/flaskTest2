@@ -2,8 +2,10 @@
 {% block title %}On Off{% endblock %}
 {% block content %}
 
-<form method="post" action="/onoff">
-    <button type="submit" value="ON" class="btn btn-success" name="action">Einschalten</button>
-    <button type="submit" value="OFF" class="btn btn-danger" name="action">Ausschalten</button>
-</form>
+<div class="card">
+    <form method="post" action="/onoff">
+        <button type="submit" value="ON" class="btn btn-success variant2" name="action">Open</button>
+        <button type="submit" value="OFF" class="btn btn-danger variant2" name="action">Close</button>
+    </form>
+</div>
 {% endblock %}
