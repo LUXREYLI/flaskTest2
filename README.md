@@ -137,7 +137,6 @@ Session are cookie based... \
 https://medium.com/thedevproject/flask-sessions-what-are-they-for-how-it-works-what-options-i-have-to-persist-this-data-4ca48a34d3
 
 
-- die Variable softKeypad in der Auswertung einbauen - wenn nicht dann sie später löschen
 - neue MailAdresse erstellen oder eine andere von GIO gebrauchen
 
 - keypad - hier sollte es eine Lampe geben, wenn die Anlage nicht aktiv ist

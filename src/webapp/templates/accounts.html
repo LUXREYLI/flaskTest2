@@ -32,9 +32,15 @@
             {% endfor %}
         </div>
         {% if message is not none %}
-        <div class="alert alert-danger" role="alert">
+        {% if typeMsg == 1 %}
+        <div class="alert" role="alert">
             {{ message }}
         </div>
+        {% else %}
+        <div class="alert success" role="alert">
+            {{ message }}
+        </div>
+        {% endif %}
         {% endif %}
     </form>
 </div>

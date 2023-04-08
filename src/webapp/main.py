@@ -65,7 +65,7 @@ def EmailExists(email):
 
 
 # function to handle the keypadtimezone
-def KeypadHandler(actionValue, softKeypad):
+def KeypadHandler(actionValue):
     localBuf = ''
     if actionValue in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'B', 'C', 'D', '#']:
         actionValidated = False
@@ -200,7 +200,7 @@ def softkeypad():
     localBuf = ''
     if request.method == 'POST':
         actionValue = request.form.get('action')
-        localBuf = KeypadHandler(actionValue, True)
+        localBuf = KeypadHandler(actionValue)
 
     if localBuf[0:7] == 'Init - ':
         # initialize the user
@@ -214,7 +214,7 @@ def softkeypad():
 def physicalkeypad():
     inputJson = request.get_json()
     actionValue = inputJson['keystroke']
-    localBuf = KeypadHandler(actionValue, False)
+    localBuf = KeypadHandler(actionValue)
 
     returnValue = {'answer': localBuf}
     return jsonify(returnValue)
@@ -243,6 +243,7 @@ def accounts():
         # extend session time
         session['adminMode'] = True
 
+    typeMessage = 1
     message = None
     accountId = None
     if request.method == 'POST':
@@ -270,7 +271,7 @@ def accounts():
                 message = 'E-Mail can\'t be empty...'
             elif myData.email is None or email.strip() != myData.email:
                 if EmailExists(email):
-                    message = 'E-Mail already exists...'
+                    message = 'E-Mail address already exists'
                 else:
                     try:
                         email = validate_email(
@@ -281,7 +282,7 @@ def accounts():
 
                     except EmailNotValidError as e:
                         print(str(e))
-                        message = 'E-Mail not valid...'
+                        message = 'E-Mail address not valid'
 
             if message is None:
                 # generate a random password and convert string to byte
@@ -301,7 +302,9 @@ def accounts():
                     'MAIL_ADDRESS'), recipients=[email])
                 msg.body = 'Hello ' + email + ' your init password is: ' + pwd
                 mail.send(msg)
-                message = 'E-Mail was sending...'
+
+                typeMessage = 2
+                message = 'E-Mail has been sended'
 
                 # write to logInfo
                 WriteLog(5, accountId)
@@ -309,7 +312,7 @@ def accounts():
     # get all data for accountId
     accountId = 'A' if accountId is None else accountId
     myData = db.session.query(Account).filter(Account.account_id == accountId)
-    return render_template('accounts.html', accounts=myData, message=message)
+    return render_template('accounts.html', accounts=myData, message=message, typeMsg=typeMessage)
 
 
 @app.route("/onoff", methods=['GET', 'POST'])

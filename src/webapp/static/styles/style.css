@@ -85,6 +85,10 @@ h1 {
     animation: alert 1s ease;
 }
 
+.alert.success{
+    color: green;
+}
+
 .table {
     table-layout: fixed;
     width: 100px;
