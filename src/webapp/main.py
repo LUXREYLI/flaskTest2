@@ -54,7 +54,7 @@ def CloseLock():
     GPIO.output(constant.LOCK_PIN, GPIO.LOW)
     print('Closed...')
 
-    # manually Push a Context (-> https://flask.palletsprojects.com/en/2.2.x/appcontext/)
+    # manually push a context (-> https://flask.palletsprojects.com/en/2.2.x/appcontext/)
     with app.app_context():
         WriteLog(7)
 
