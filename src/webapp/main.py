@@ -52,7 +52,11 @@ GPIO.setup(constant.ALERT_PIN, GPIO.OUT)
 # function to close the lock again after X seconds
 def CloseLock():
     GPIO.output(constant.LOCK_PIN, GPIO.LOW)
-    print('Off...')
+    print('Closed...')
+
+    # manually Push a Context (-> https://flask.palletsprojects.com/en/2.2.x/appcontext/)
+    with app.app_context():
+        WriteLog(7)
 
 
 # function to check if email already exists in account
@@ -112,7 +116,7 @@ def KeypadHandler(actionValue, softKeypad):
                         GPIO.output(constant.LOCK_PIN, GPIO.HIGH)
 
                         # output on console
-                        print('On...')
+                        print('Open...')
 
                         # write to logInfo
                         WriteLog(1, localBuf[:1])
@@ -129,7 +133,7 @@ def KeypadHandler(actionValue, softKeypad):
                         session.clear()
 
                         # output on console
-                        print('Already on...')
+                        print('Already open...')
 
                         # write to logInfo
                         WriteLog(2, localBuf[:1])
@@ -171,6 +175,8 @@ def WriteLog(messageId, accountId=None):
         message = 'Set account information'
     elif messageId == 6:
         message = 'Initialize account'
+    elif messageId == 7:
+        message = 'Closed'
     else:
         message = 'N/A'
 
