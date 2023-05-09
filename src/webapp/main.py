@@ -315,6 +315,20 @@ def accounts():
     return render_template('accounts.html', accounts=myData, message=message, typeMsg=typeMessage)
 
 
+@app.route("/onoff", methods=['GET', 'POST'])
+def onoff():
+    if request.method == 'POST':
+        if request.form.get('action') == 'ON':
+            GPIO.output(constant.LOCK_PIN, GPIO.HIGH)
+            GPIO.output(constant.ALERT_PIN, GPIO.HIGH)
+        elif request.form.get('action') == 'OFF':
+            GPIO.output(constant.LOCK_PIN, GPIO.LOW)
+            GPIO.output(constant.ALERT_PIN, GPIO.LOW)
+        else:
+            pass  # unknown
+    return render_template('onoff.html')
+
+
 @app.route("/pincode", methods=['GET', 'POST'])
 def pincode():
     # the mode must be specified
