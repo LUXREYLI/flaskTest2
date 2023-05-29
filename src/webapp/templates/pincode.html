@@ -4,7 +4,10 @@
 
 {% if controls is not none %}
 <div class="card">
-  <form method="post" action="/setcode?mode={{ mode }}">
+  <!-- define the url parameters  -->
+  {% set parameter = '/pincode?mode=' ~ mode if (mode == '1' or mode == '2') else '/pincode?mode=3&user=' ~  user %}
+
+  <form method="post" action="{{ parameter }}">
     <div class="form-group">
       <!-- define the password pattern  -->
       {% set pwdPattern = '[0-9]{5}' if (mode == '1' or mode == '2') else '[0-9]{4}' %}
@@ -15,7 +18,7 @@
       <input type="password" pattern="{{ pwdPattern }}" class="form-control" name="{{ controls[item].controlName }}" placeholder="Pin code">
       {% endfor %}
       <br>
-      <button type="submit" class="btn btn-success">Confirm</button>
+      <button type="submit" class="btn btn-success variant2">Confirm</button>
     </div>
     {% if message is not none %}
     <div class="alert alert-danger" role="alert">
@@ -24,7 +27,7 @@
     {% endif %}
   </form>
   {% else %}
-  <h3>The mode must be specified --> .../setcode?mode=1 or .../setcode?mode=3</h3>
+  <h3>The mode must be specified --> .../pincode?mode=[1-3]</h3>
 </div>
 {% endif %}
 {% endblock %}

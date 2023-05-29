@@ -2,13 +2,46 @@
 {% block title %}Accounts{% endblock %}
 {% block content %}
 
-<form method="post" action="/accounts">
-    {% for account in accounts %}
-        <div class='book'>
-            <h3>{{ account.account_id }}, {{ account.email }}, {{ account.password }}, {{ account.initialized }}</h3>
+<div class="card">
+    <form method="post" action="/accounts">
+        <div class="form-group">
+            {% for account in accounts %}
+            <!-- listbox with all accounts  -->
+            <h3>Account ID</h3>
+            <select class="form-select" aria-label="Default select example" onchange="this.form.submit()"
+                name="account">
+                <option {{ 'selected' if account.account_id=='A' }} value="A">A</option>
+                <option {{ 'selected' if account.account_id=='B' }} value="B">B</option>
+                <option {{ 'selected' if account.account_id=='C' }} value="C">C</option>
+                <option {{ 'selected' if account.account_id=='D' }} value="D">D</option>
+            </select>
+
+            <h3>E-Mail</h3>
+            {% set mail = '' if account.email is none else account.email %}
+            <input class="form-control small" type="text" name="mail" value="{{ mail }}">
+            <h3>Initialized</h3>
+            <input class="form-control" type="text" name="initialized" value="{{ account.initialized }}" readonly>
+
+            <br>
+            <div class="d-grid gap-2 d-md-block">
+                <button type="submit" value="Set" class="btn btn-success variant2" name="action">Set</button>
+                {% if account.email is not none %}
+                <button type="submit" value="Reset" class="btn btn-danger variant2" name="action">Reset</button>
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
-    {% endfor %}
-    <button type="submit" value="ON" class="btn btn-success" name="action">Einschalten</button>
-    <button type="submit" value="OFF" class="btn btn-danger" name="action">Ausschalten</button>
-</form>
+        {% if message is not none %}
+        {% if typeMsg == 1 %}
+        <div class="alert" role="alert">
+            {{ message }}
+        </div>
+        {% else %}
+        <div class="alert success" role="alert">
+            {{ message }}
+        </div>
+        {% endif %}
+        {% endif %}
+    </form>
+</div>
 {% endblock %}

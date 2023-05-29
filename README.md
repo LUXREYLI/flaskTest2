@@ -1,15 +1,7 @@
-https://www.markdownguide.org/basic-syntax/
+1. Markdown \
+   https://www.markdownguide.org/basic-syntax/
 
-
-1. Bootstrap \
-   https://getbootstrap.com/docs/5.3/getting-started/introduction/ \
-   Bootstrap is a powerful, feature-packed frontend toolkit. \
-   I have not included Popper.
-
-2. HTML \
-   https://www.w3schools.com/tags/att_button_type.asp
-
-3. FLASK - youtube \
+2. FLASK - youtube \
    https://www.youtube.com/watch?v=4nzI4RKwb5I&list=PLzMcBGfZo4-n4vJJybUVV3Un_NFS5EOgX&index=3
 
 3. GIT \
@@ -22,16 +14,10 @@ https://www.markdownguide.org/basic-syntax/
    https://www.digitalocean.com/community/tutorials/how-to-use-git-integration-in-visual-studio-code-de
 
 5. Docker \
-   Allgemeine Erklärungen \
-   https://supperundsupper.com/schneller-besser-docker \
-   https://supperundsupper.com/docker-container-vs-virtuelle-maschine
-
-   Flask Anwendung unter Docker bereitstellen \
-   https://www.freecodecamp.org/news/how-to-dockerize-a-flask-app/ \
 
    ```console
    # Show the IP Address
-   hostnqme -I
+   hostname -I
 
    # List all docker images
    docker images
@@ -112,10 +98,10 @@ https://www.markdownguide.org/basic-syntax/
    bcrypt \
    https://stackabuse.com/hashing-passwords-in-python-with-bcrypt/
 
+8. Postgres \
+   https://medium.com/free-code-camp/docker-development-workflow-a-guide-with-flask-and-postgres-db1a1843044a
+
 8. ToDo \
-    https://medium.com/free-code-camp/docker-development-workflow-a-guide-with-flask-and-postgres-db1a1843044a
-
-
     https://stavshamir.github.io/python/dockerizing-a-flask-mysql-app-with-docker-compose/
 
     https://pypi.org/project/flask-swagger/
@@ -144,3 +130,14 @@ https://github.com/vsupalov/big-album-art/blob/79bdaba51717b62e0fe4dac59e85ec21e
 https://stackabuse.com/using-sqlalchemy-with-flask-and-postgresql/
 https://dev.to/blankgodd/working-with-postgresql-and-flasksqlalchemy-3c38
 https://pythonbasics.org/flask-sqlalchemy/
+
+ich habe den Folder __pycache__ versteckt -> https://paulnelson.ca/posts/hiding-pycache-files-in-vscode
+
+Session are cookie based... \
+https://medium.com/thedevproject/flask-sessions-what-are-they-for-how-it-works-what-options-i-have-to-persist-this-data-4ca48a34d3
+
+
+- neue MailAdresse erstellen oder eine andere von GIO gebrauchen
+
+- keypad - hier sollte es eine Lampe geben, wenn die Anlage nicht aktiv ist
+-        - eine andere Lampe, wenn der gewählte User nicht gesetzt ist

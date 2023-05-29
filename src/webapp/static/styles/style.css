@@ -16,9 +16,10 @@ h1 {
     margin-left: -185px;
 }
 
+/* base config for button */
 .btn-primary,
+.btn-success,
 .btn-danger {
-    background-color: rgb(20, 43, 255);
     border-color: white;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -29,23 +30,41 @@ h1 {
     min-width: 80px;
 }
 
+/* change the color for background*/
+.btn-primary{
+    background-color: rgb(20, 43, 255);
+}
+
 .btn-danger {
     background-color: rgb(204, 0, 0);
 }
 
-.btn-success {
-    min-height: 50px;
+.btn-danger.variant2,
+.btn-success.variant2{
     min-width: 360px;
-    font-size: 40px;
     margin-left: 4px;
     margin-right: 4px;
-    margin-bottom: 4px;
 }
 
 .form-control {
     font-size: 50px;
     font-family: monospace;
     text-align: center;
+    height: 70px;
+    width: 360px;
+    margin-left: 4px;
+    margin-top: 4px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+
+.form-control.small {
+    font-size: 25px;
+}
+
+.form-select {
+    font-size: 50px;
+    font-family: monospace;
     height: 70px;
     width: 360px;
     margin-left: 4px;
@@ -64,6 +83,15 @@ h1 {
     border-color: transparent;
     color: rgb(255, 50, 50);
     animation: alert 1s ease;
+}
+
+.alert.success{
+    color: green;
+}
+
+.table {
+    table-layout: fixed;
+    width: 100px;
 }
 
 @keyframes alert {
