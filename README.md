@@ -1,19 +1,4 @@
-1. Markdown \
-   https://www.markdownguide.org/basic-syntax/
-
-2. FLASK - youtube \
-   https://www.youtube.com/watch?v=4nzI4RKwb5I&list=PLzMcBGfZo4-n4vJJybUVV3Un_NFS5EOgX&index=3
-
-3. GIT \
-   Von der folgenden Seite habe ich nur bis einschließlich Punkt 5 gemacht und den REST über VS Code. \
-   Denke aber, dass Punkt 5 nicht gemacht werden muss. \
-   https://sites.google.com/site/cartwrightraspberrypiprojects/home/ramblings/tutorials/using-github?pli=1
-
-   Installation der GitLens Extension in VS Code und diese mit dem GitHub-Konto verbunden. \
-   Dazu ist der folgende Link auch interessant: \
-   https://www.digitalocean.com/community/tutorials/how-to-use-git-integration-in-visual-studio-code-de
-
-5. Docker \
+1. Docker \
 
    ```console
    # Show the IP Address
@@ -64,19 +49,20 @@
    # Reset Masterpassword
    UPDATE parameter SET password = NULL, initialized = FALSE;
 
-   # See table content
+   # See table parameter/loginfo
    SELECT * FROM parameter;
+   SELECT * FROM loginfo;
    ```
 
    Probleme \
    Folgendes musste in die Docker Compose Datei eingebaut werden. Ansonsten geht der Zugriff auf die GPIO nicht. \
    https://www.gerbenvanadrichem.com/infrastructure/accessing-gpio-pins-inside-a-docker-container-on-a-raspberry-pi/
 
-6. THREAD \
+2. THREAD \
    https://unbiased-coder.com/python-flask-multithreading/ \
    https://www.section.io/engineering-education/how-to-perform-threading-timer-in-python/
 
-7. DIVERS \
+3. DIVERS \
    Die Session kann komplett geleert werden mit:
    ```
    session.clear
@@ -98,46 +84,5 @@
    bcrypt \
    https://stackabuse.com/hashing-passwords-in-python-with-bcrypt/
 
-8. Postgres \
+4. Postgres \
    https://medium.com/free-code-camp/docker-development-workflow-a-guide-with-flask-and-postgres-db1a1843044a
-
-8. ToDo \
-    https://stavshamir.github.io/python/dockerizing-a-flask-mysql-app-with-docker-compose/
-
-    https://pypi.org/project/flask-swagger/
-
-    https://auth0.com/blog/developing-restful-apis-with-python-and-flask/
-
-    WSGI HTTP Server - gunicorn
-    https://www.donskytech.com/create-flask-web-application-in-raspberry-pi/
-
-
-    https://testdriven.io/blog/dockerizing-flask-with-postgres-gunicorn-and-nginx/
-
-    https://flask-socketio.readthedocs.io/en/latest/
-
-
-9. GIO Notes
-
-    https://jinja.palletsprojects.com/en/3.1.x/templates/#jinja-filters.map
-
-
-
-
-
-https://www.askpython.com/python-modules/flask/flask-postgresql
-https://github.com/vsupalov/big-album-art/blob/79bdaba51717b62e0fe4dac59e85ec21e2e035df/baa/main.py#L40
-https://stackabuse.com/using-sqlalchemy-with-flask-and-postgresql/
-https://dev.to/blankgodd/working-with-postgresql-and-flasksqlalchemy-3c38
-https://pythonbasics.org/flask-sqlalchemy/
-
-ich habe den Folder __pycache__ versteckt -> https://paulnelson.ca/posts/hiding-pycache-files-in-vscode
-
-Session are cookie based... \
-https://medium.com/thedevproject/flask-sessions-what-are-they-for-how-it-works-what-options-i-have-to-persist-this-data-4ca48a34d3
-
-
-- neue MailAdresse erstellen oder eine andere von GIO gebrauchen
-
-- keypad - hier sollte es eine Lampe geben, wenn die Anlage nicht aktiv ist
--        - eine andere Lampe, wenn der gewählte User nicht gesetzt ist

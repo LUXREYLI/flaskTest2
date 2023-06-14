@@ -64,19 +64,56 @@ def EmailExists(email):
     return db.session.query(Account.query.filter(Account.email == email).exists()).scalar()
 
 
+# function to check if thread is already running
+def IsThreadRunning():
+    isThreadRunning = False
+    for thread in threading.enumerate():
+        if thread.name == 'Thread_CloseLock':
+            isThreadRunning = True
+    return isThreadRunning
+
+
+# function to open the lock
+def OpenLock(accountId=None):
+    GPIO.output(constant.LOCK_PIN, GPIO.HIGH)
+
+    # output on console
+    print('Open...')
+
+    # write to logInfo
+    WriteLog(1, accountId)
+
+    # start a thread to close again after 5 sec.
+    thread = threading.Timer(5, CloseLock)
+    thread.name = 'Thread_CloseLock'
+    thread.start()
+
+
 # function to handle the keypadtimezone
 def KeypadHandler(actionValue):
     localBuf = ''
-    if actionValue in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'B', 'C', 'D', '#']:
+    if actionValue in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'B', 'C', 'D', '#', 'X']:
         actionValidated = False
 
-        if not 'startTime' in session:
+        if actionValue == 'X':
+            # check if thread is already running
+            if not IsThreadRunning():
+                OpenLock()
+            else:
+                # output on console
+                print('Already open...')
+
+                # write to logInfo
+                WriteLog(2)
+        elif not 'startTime' in session:
             if actionValue in ['A', 'B', 'C', 'D']:
                 # check if the user is initialized
                 myData = db.session.get(Account, actionValue)
+                GPIO.output(constant.ALERT_PIN, GPIO.LOW)
                 if not myData.initialized and myData.password is None:
                     # the user is not configured
                     localBuf = 'Not config.'
+                    GPIO.output(constant.ALERT_PIN, GPIO.HIGH)
                 elif not myData.initialized:
                     localBuf = 'Init - ' + actionValue
                 else:
@@ -107,24 +144,8 @@ def KeypadHandler(actionValue):
                 currentPwd = localBuf[2:-1]
                 if bcrypt.checkpw(currentPwd.encode('utf-8'), myData.password):
                     # check if thread is already running
-                    isThreadRunning = False
-                    for thread in threading.enumerate():
-                        if thread.name == 'Thread_CloseLock':
-                            isThreadRunning = True
-
-                    if not isThreadRunning:
-                        GPIO.output(constant.LOCK_PIN, GPIO.HIGH)
-
-                        # output on console
-                        print('Open...')
-
-                        # write to logInfo
-                        WriteLog(1, localBuf[:1])
-
-                        # start a thread to close again after 5 sec.
-                        thread = threading.Timer(5, CloseLock)
-                        thread.name = 'Thread_CloseLock'
-                        thread.start()
+                    if not IsThreadRunning():
+                        OpenLock(localBuf[:1])
 
                         # clear the session
                         session.clear()
@@ -153,8 +174,9 @@ def KeypadHandler(actionValue):
     elif actionValue == '*':
         # clear the session
         session.clear()
-        # switch off the led
+        # switch off
         GPIO.output(constant.LOCK_PIN, GPIO.LOW)
+        GPIO.output(constant.ALERT_PIN, GPIO.LOW)
     else:
         pass  # unknown
 
@@ -200,6 +222,11 @@ def softkeypad():
     localBuf = ''
     if request.method == 'POST':
         actionValue = request.form.get('action')
+
+        # X must only come from the physical keypad
+        if actionValue == 'X':
+            actionValue = 'Y'
+
         localBuf = KeypadHandler(actionValue)
 
     if localBuf[0:7] == 'Init - ':
