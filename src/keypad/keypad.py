@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import time
 
 
 class keypad():
@@ -41,9 +42,14 @@ class keypad():
                     for j in range(len(self.COLUMN)):
                         tmpRead = GPIO.input(self.COLUMN[j])
                         if tmpRead == 1:
-                            rowVal = i
-                            colVal = j
-                            break
+                            # Read keystroke again after 0.1 second.
+                            # To avoid an error signal when the relay switches.
+                            time.sleep(0.1)
+                            tmpRead = GPIO.input(self.COLUMN[j])
+                            if tmpRead == 1:
+                                rowVal = i
+                                colVal = j
+                                break
                     GPIO.output(self.ROW[i], GPIO.LOW)
                 else:
                     break
